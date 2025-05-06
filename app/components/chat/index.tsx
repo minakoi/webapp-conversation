@@ -1,6 +1,6 @@
 'use client'
 import type { FC } from 'react'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import cn from 'classnames'
 import { useTranslation } from 'react-i18next'
 import Textarea from 'rc-textarea'
@@ -15,6 +15,28 @@ import Toast from '@/app/components/base/toast'
 import ChatImageUploader from '@/app/components/base/image-uploader/chat-image-uploader'
 import ImageList from '@/app/components/base/image-uploader/image-list'
 import { useImageFiles } from '@/app/components/base/image-uploader/hooks'
+import { Mic, MicOff } from 'lucide-react'
+
+// Define the SpeechRecognition type
+interface ISpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  onerror: (event: any) => void;
+  onresult: (event: any) => void;
+  onend: () => void;
+}
+
+// Define the window with SpeechRecognition
+declare global {
+  interface Window {
+    SpeechRecognition: new () => ISpeechRecognition;
+    webkitSpeechRecognition: new () => ISpeechRecognition;
+  }
+}
 
 export type IChatProps = {
   chatList: ChatItem[]
@@ -50,6 +72,8 @@ const Chat: FC<IChatProps> = ({
   const { t } = useTranslation()
   const { notify } = Toast
   const isUseInputMethod = useRef(false)
+  const [isListening, setIsListening] = useState(false)
+  const recognitionRef = useRef<ISpeechRecognition | null>(null)
 
   const [query, setQuery] = React.useState('')
   const handleContentChange = (e: any) => {
@@ -73,6 +97,75 @@ const Chat: FC<IChatProps> = ({
     if (controlClearQuery)
       setQuery('')
   }, [controlClearQuery])
+
+  // Setup SpeechRecognition
+  useEffect(() => {
+    // Check if browser supports SpeechRecognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+
+    if (!SpeechRecognition) {
+      console.warn('Speech recognition not supported in this browser')
+      return
+    }
+
+    // Initialize recognition
+    const recognition = new SpeechRecognition()
+    recognition.continuous = true
+    recognition.interimResults = true
+    recognition.lang = 'ja-JP' // Default language, could be made configurable
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map(result => result[0])
+        .map(result => result.transcript)
+        .join('')
+
+      // Update query with transcribed text
+      setQuery(prevQuery => {
+        const lastResult = event.results[event.results.length - 1]
+        // Only use final results to avoid jittery text updates
+        if (lastResult.isFinal) {
+          return prevQuery + ' ' + lastResult[0].transcript
+        }
+        return prevQuery
+      })
+    }
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error', event)
+      setIsListening(false)
+      notify({ type: 'error', message: 'Speech recognition error', duration: 3000 })
+    }
+
+    recognition.onend = () => {
+      setIsListening(false)
+    }
+
+    recognitionRef.current = recognition
+
+    // Cleanup
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort()
+      }
+    }
+  }, [])
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      notify({ type: 'error', message: 'Speech recognition not supported in your browser', duration: 3000 })
+      return
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop()
+      setIsListening(false)
+    } else {
+      recognitionRef.current.start()
+      setIsListening(true)
+    }
+  }
+
   const {
     files,
     onUpload,
@@ -172,8 +265,7 @@ const Chat: FC<IChatProps> = ({
               }
               <Textarea
                 className={`
-                  block w-full px-2 pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
-                  ${visionConfig?.enabled && 'pl-12'}
+                  block w-full px-2 ${visionConfig?.enabled ? 'pl-12' : 'pl-10'} pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
                 `}
                 value={query}
                 onChange={handleContentChange}
@@ -181,6 +273,25 @@ const Chat: FC<IChatProps> = ({
                 onKeyDown={handleKeyDown}
                 autoSize
               />
+              <div className="absolute bottom-2 left-2 flex items-center">
+                {!visionConfig?.enabled && (
+                  <Tooltip
+                    selector='mic-tip'
+                    htmlContent={
+                      <div>
+                        {isListening ? t('common.operation.stopListening') : t('common.operation.startListening')}
+                      </div>
+                    }
+                  >
+                    <div
+                      className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded-md ${isListening ? 'bg-red-100' : 'hover:bg-gray-100'}`}
+                      onClick={toggleListening}
+                    >
+                      {isListening ? <MicOff size={18} className="text-red-500" /> : <Mic size={18} className="text-gray-500" />}
+                    </div>
+                  </Tooltip>
+                )}
+              </div>
               <div className="absolute bottom-2 right-2 flex items-center h-8">
                 <div className={`${s.count} mr-4 h-5 leading-5 text-sm bg-gray-50 text-gray-500`}>{query.trim().length}</div>
                 <Tooltip
