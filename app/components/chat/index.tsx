@@ -134,7 +134,7 @@ const Chat: FC<IChatProps> = ({
     recognition.onerror = (event) => {
       console.error('Speech recognition error', event)
       setIsListening(false)
-      notify({ type: 'error', message: 'Speech recognition error', duration: 3000 })
+      // notify({ type: 'error', message: 'Speech recognition error', duration: 3000 })
     }
 
     recognition.onend = () => {

@@ -22,6 +22,7 @@ import AppUnavailable from '@/app/components/app-unavailable'
 import { API_KEY, APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
 import type { Annotation as AnnotationType } from '@/types/log'
 import { addFileInfos, sortAgentSorts } from '@/utils/tools'
+import { textToSpeech } from '@/service/tts-service'
 
 export type IMainProps = {
   params: any
@@ -61,6 +62,30 @@ const Main: FC<IMainProps> = () => {
       setAutoFreeze(true)
     }
   }, [])
+
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const playMessageAudio = async (text: string) => {
+    try {
+      console.log("playMessageAudio start");
+      const audioData = await textToSpeech(text);
+
+      // Convert ArrayBuffer to Blob
+      const blob = new Blob([audioData], { type: 'audio/mpeg' });
+      const url = URL.createObjectURL(blob);
+      console.log(url);
+
+      // Create and play audio element
+      if (audioRef.current) {
+        audioRef.current.src = url;
+        audioRef.current.play();
+        console.log("playMessageAudio play");
+      }
+      console.log("playMessageAudio end");
+    } catch (error) {
+      console.error('Failed to play TTS audio:', error);
+    }
+  };
 
   /*
   * conversation info
@@ -412,6 +437,7 @@ const Main: FC<IMainProps> = () => {
         setAbortController(abortController)
       },
       onData: (message: string, isFirstMessage: boolean, { conversationId: newConversationId, messageId, taskId }: any) => {
+        if (taskId && message) { playMessageAudio(message); }
         if (!isAgentMode) {
           responseItem.content = responseItem.content + message
         }
@@ -692,6 +718,7 @@ const Main: FC<IMainProps> = () => {
               </div>)
           }
         </div>
+        <audio ref={audioRef} autoPlay className="hidden" />
       </div>
     </div>
   )
