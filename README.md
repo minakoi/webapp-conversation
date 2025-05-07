@@ -74,7 +74,16 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 
 > ⚠️ If you are using [Vercel Hobby](https://vercel.com/pricing), your message will be truncated due to the limitation of vercel.
 
-
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+Vercelにデプロイしたプロジェクトを停止する方法は、管理画面には無く、APIを叩くしかない。  
+https://vercel.com/docs/rest-api/reference/endpoints/projects/pause-a-project
+
+`curl --request POST --url https://api.vercel.com/v1/projects/{projectId}/pause --header 'Authorization: Bearer <token※account settingsから発行可能>' --header 'Content-Type: application/json'`
+
+停止解除もAPIから。  
+https://vercel.com/docs/rest-api/reference/endpoints/projects/unpause-a-project
+
+`curl --request POST --url https://api.vercel.com/v1/projects/{projectId}/unpause --header 'Authorization: Bearer <token※account settingsから発行可能>' --header 'Content-Type: application/json'`
