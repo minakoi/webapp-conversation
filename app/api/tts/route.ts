@@ -6,6 +6,10 @@ const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, // Securely stored on server
 });
 
+function convert_for_natural_conversation(text: string) {
+  text = text.replaceAll("\n", "。");
+  return text
+}
 export async function POST(req: NextRequest) {
   if (req.method?.toLocaleUpperCase() !== 'POST') {
     return NextResponse.json({ error: 'Method not allowed.' }, { status: 405 });
@@ -14,16 +18,19 @@ export async function POST(req: NextRequest) {
   try {
     const text = await req.text();
 
+    console.log("TSS", text)
 
     if (!text) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
     }
 
+    let json_text = JSON.parse(text);
+
     // Call OpenAI's TTS API from the server
     const response = await openai.audio.speech.create({
       model: 'tts-1',
       voice: 'shimmer',
-      input: text,
+      input: convert_for_natural_conversation(json_text.text),
     });
 
     // Get audio data as buffer
@@ -35,7 +42,7 @@ export async function POST(req: NextRequest) {
       headers: {
         'Content-Type': 'audio/mpeg',
         'Content-Length': buffer.length.toString(),
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        // 'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     });
   } catch (error) {
