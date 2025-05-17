@@ -18,8 +18,6 @@ export async function POST(req: NextRequest) {
   try {
     const text = await req.text();
 
-    console.log("TSS", text)
-
     if (!text) {
       return NextResponse.json({ error: 'Text is required' }, { status: 400 });
     }
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest) {
     // Call OpenAI's TTS API from the server
     const response = await openai.audio.speech.create({
       model: 'tts-1',
-      voice: 'shimmer',
+      voice: 'onyx',
       input: convert_for_natural_conversation(json_text.text),
     });
 
