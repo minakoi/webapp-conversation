@@ -436,8 +436,8 @@ const Main: FC<IMainProps> = () => {
       getAbortController: (abortController) => {
         setAbortController(abortController)
       },
-      onData: (message: string, isFirstMessage: boolean, { conversationId: newConversationId, messageId, taskId }: any) => {
-        if (taskId && message) { playMessageAudio(message); }
+      onData: async (message: string, isFirstMessage: boolean, { conversationId: newConversationId, messageId, taskId }: any) => {
+        if (taskId && message) { await playMessageAudio(message); }
         if (!isAgentMode) {
           responseItem.content = responseItem.content + message
         }
