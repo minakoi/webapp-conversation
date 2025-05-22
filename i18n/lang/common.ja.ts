@@ -17,6 +17,10 @@ const translation = {
     like: 'いいね',
     dislike: 'よくないね',
     ok: 'OK',
+    stopListening: '音声入力ストップ',
+    startListening: '音声入力スタート',
+    startTextToSpeech: '読み上げる',
+    stopTextToSpeech: '読み上げない'
   },
   imageUploader: {
     uploadFromComputer: 'コンピューターからアップロード',

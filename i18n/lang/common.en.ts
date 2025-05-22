@@ -17,6 +17,10 @@ const translation = {
     like: 'like',
     dislike: 'dislike',
     ok: 'OK',
+    stopListening: 'start voice input',
+    startListening: 'stop voice input',
+    startTextToSpeech: 'start read aloud',
+    stopTextToSpeech: 'stop read aloud'
   },
   imageUploader: {
     uploadFromComputer: 'Upload from Computer',

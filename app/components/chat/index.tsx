@@ -1,6 +1,6 @@
 'use client'
 import type { FC } from 'react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, Dispatch, SetStateAction } from 'react'
 import cn from 'classnames'
 import { useTranslation } from 'react-i18next'
 import Textarea from 'rc-textarea'
@@ -15,7 +15,7 @@ import Toast from '@/app/components/base/toast'
 import ChatImageUploader from '@/app/components/base/image-uploader/chat-image-uploader'
 import ImageList from '@/app/components/base/image-uploader/image-list'
 import { useImageFiles } from '@/app/components/base/image-uploader/hooks'
-import { Mic, MicOff } from 'lucide-react'
+import { Mic, MicOff, Volume2, VolumeOff } from 'lucide-react'
 
 // Define the SpeechRecognition type
 interface ISpeechRecognition extends EventTarget {
@@ -55,6 +55,7 @@ export type IChatProps = {
   isResponding?: boolean
   controlClearQuery?: number
   visionConfig?: VisionSettings
+  setDoTTS?: Dispatch<SetStateAction<boolean>>
 }
 
 const Chat: FC<IChatProps> = ({
@@ -68,11 +69,13 @@ const Chat: FC<IChatProps> = ({
   isResponding,
   controlClearQuery,
   visionConfig,
+  setDoTTS
 }) => {
   const { t } = useTranslation()
   const { notify } = Toast
   const isUseInputMethod = useRef(false)
   const [isListening, setIsListening] = useState(false)
+  const [isVolumeOn, setVolumeOn] = useState(true)
   const recognitionRef = useRef<ISpeechRecognition | null>(null)
 
   const [query, setQuery] = React.useState('')
@@ -163,6 +166,17 @@ const Chat: FC<IChatProps> = ({
     } else {
       recognitionRef.current.start()
       setIsListening(true)
+    }
+  }
+
+  const toggleVolumeOn = () => {
+    if (isVolumeOn) {
+      setVolumeOn(false)
+      if (setDoTTS) setDoTTS(false)
+
+    } else {
+      setVolumeOn(true)
+      if (setDoTTS) setDoTTS(true)
     }
   }
 
@@ -265,7 +279,7 @@ const Chat: FC<IChatProps> = ({
               }
               <Textarea
                 className={`
-                  block w-full px-2 ${visionConfig?.enabled ? 'pl-12' : 'pl-10'} pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
+                  block w-full px-2 pl-[75px] pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
                 `}
                 value={query}
                 onChange={handleContentChange}
@@ -274,23 +288,36 @@ const Chat: FC<IChatProps> = ({
                 autoSize
               />
               <div className="absolute bottom-2 left-2 flex items-center">
-                {!visionConfig?.enabled && (
-                  <Tooltip
-                    selector='mic-tip'
-                    htmlContent={
-                      <div>
-                        {isListening ? t('common.operation.stopListening') : t('common.operation.startListening')}
-                      </div>
-                    }
-                  >
-                    <div
-                      className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded-md ${isListening ? 'bg-red-100' : 'hover:bg-gray-100'}`}
-                      onClick={toggleListening}
-                    >
-                      {isListening ? <MicOff size={18} className="text-red-500" /> : <Mic size={18} className="text-gray-500" />}
+                <Tooltip
+                  selector='volume2'
+                  htmlContent={
+                    <div>
+                      {isVolumeOn ? t('common.operation.stopTextToSpeech') : t('common.operation.startTextToSpeech')}
                     </div>
-                  </Tooltip>
-                )}
+                  }
+                >
+                  <div
+                    className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded-md ${isVolumeOn ? 'hover:bg-gray-100' : 'bg-red-100'}`}
+                    onClick={toggleVolumeOn}
+                  >
+                    {isVolumeOn ? <Volume2 size={18} className="text-gray-500" /> : <VolumeOff size={18} className="text-red-500" />}
+                  </div>
+                </Tooltip>
+                <Tooltip
+                  selector='mic-tip'
+                  htmlContent={
+                    <div>
+                      {isListening ? t('common.operation.stopListening') : t('common.operation.startListening')}
+                    </div>
+                  }
+                >
+                  <div
+                    className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded-md ${isListening ? 'hover:bg-gray-100' : 'bg-red-100'}`}
+                    onClick={toggleListening}
+                  >
+                    {isListening ? <Mic size={18} className="text-gray-500" /> : <MicOff size={18} className="text-red-500" />}
+                  </div>
+                </Tooltip>
               </div>
               <div className="absolute bottom-2 right-2 flex items-center h-8">
                 <div className={`${s.count} mr-4 h-5 leading-5 text-sm bg-gray-50 text-gray-500`}>{query.trim().length}</div>

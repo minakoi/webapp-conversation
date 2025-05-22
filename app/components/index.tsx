@@ -49,6 +49,7 @@ const Main: FC<IMainProps> = () => {
     detail: Resolution.low,
     transfer_methods: [TransferMethod.local_file],
   })
+  const [doTTS, setDoTTS] = useState<boolean>(true)
 
   useEffect(() => {
     if (APP_INFO?.title)
@@ -67,6 +68,7 @@ const Main: FC<IMainProps> = () => {
 
   const playMessageAudio = async (text: string) => {
     try {
+      if (text.indexOf("【お知らせ】") >= 0) return;
       console.log("playMessageAudio start");
       const audioData = await textToSpeech(text);
 
@@ -320,6 +322,7 @@ const Main: FC<IMainProps> = () => {
     return true
   }
 
+
   const [controlFocus, setControlFocus] = useState(0)
   const [openingSuggestedQuestions, setOpeningSuggestedQuestions] = useState<string[]>([])
   const [messageTaskId, setMessageTaskId] = useState('')
@@ -437,7 +440,7 @@ const Main: FC<IMainProps> = () => {
         setAbortController(abortController)
       },
       onData: async (message: string, isFirstMessage: boolean, { conversationId: newConversationId, messageId, taskId }: any) => {
-        if (taskId && message) { await playMessageAudio(message); }
+        if (taskId && message && doTTS) { await playMessageAudio(message); }
         if (!isAgentMode) {
           responseItem.content = responseItem.content + message
         }
@@ -713,6 +716,7 @@ const Main: FC<IMainProps> = () => {
                     isResponding={isResponding}
                     checkCanSend={checkCanSend}
                     visionConfig={visionConfig}
+                    setDoTTS={setDoTTS}
                   />
                 </div>
               </div>)

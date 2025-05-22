@@ -23,12 +23,12 @@ const AppIcon: FC<AppIconProps> = ({
         size !== 'medium' && style[size],
         rounded && style.rounded,
         className ?? '',
+        style.logo
       )}
       style={{
         background,
       }}
     >
-      🤖
     </span>
   )
 }
