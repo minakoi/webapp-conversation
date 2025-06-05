@@ -74,7 +74,9 @@
 }
 
 .sendBtn {
-  background: url(./icons/send.svg) center center no-repeat;
+  background: url(./icons/send-active.svg) center center no-repeat;
+  /* background-image: url(./icons/send-active.svg); */
+  background-color: #EBF5FF;
 }
 
 .sendBtn:hover {

@@ -18,7 +18,12 @@
 }
 
 .customBtn {
-  width: 136px;
+  width: calc(100vw - 30px);
+  max-width: 400px;
+  font-weight: 700;
+  font-size: 3rem;
+  height: 5rem;
+  background-color: #C2007B;
 }
 
 .logo {

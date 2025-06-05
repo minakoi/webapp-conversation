@@ -75,7 +75,7 @@ const Chat: FC<IChatProps> = ({
   const { notify } = Toast
   const isUseInputMethod = useRef(false)
   const [isListening, setIsListening] = useState(false)
-  const [isVolumeOn, setVolumeOn] = useState(true)
+  const [isVolumeOn, setVolumeOn] = useState(false)
   const recognitionRef = useRef<ISpeechRecognition | null>(null)
 
   const [query, setQuery] = React.useState('')
@@ -320,7 +320,6 @@ const Chat: FC<IChatProps> = ({
                 </Tooltip>
               </div>
               <div className="absolute bottom-2 right-2 flex items-center h-8">
-                <div className={`${s.count} mr-4 h-5 leading-5 text-sm bg-gray-50 text-gray-500`}>{query.trim().length}</div>
                 <Tooltip
                   selector='send-tip'
                   htmlContent={

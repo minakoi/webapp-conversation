@@ -49,7 +49,7 @@ const Main: FC<IMainProps> = () => {
     detail: Resolution.low,
     transfer_methods: [TransferMethod.local_file],
   })
-  const [doTTS, setDoTTS] = useState<boolean>(true)
+  const [doTTS, setDoTTS] = useState<boolean>(false)
 
   useEffect(() => {
     if (APP_INFO?.title)
@@ -672,16 +672,11 @@ const Main: FC<IMainProps> = () => {
 
   return (
     <div className='bg-gray-100'>
-      <Header
-        title={APP_INFO.title}
-        isMobile={isMobile}
-        onShowSideBar={showSidebar}
-        onCreateNewChat={() => handleConversationIdChange('-1')}
-      />
-      <div className="flex rounded-t-2xl bg-white overflow-hidden">
+      <div className="flex bg-white overflow-hidden"
+        style={{ backgroundImage: hasSetInputs ? "" : "url(./images/2505COCORO_COSMOS_dify_light.jpg)", backgroundPosition: "center", backgroundRepeat: "no-repeat", backgroundColor: "#282F60", backgroundAttachment: "fixed" }}>
         {/* sidebar */}
-        {!isMobile && renderSidebar()}
-        {isMobile && isShowSidebar && (
+        {hasSetInputs && !isMobile && renderSidebar()}
+        {hasSetInputs && isMobile && isShowSidebar && (
           <div className='fixed inset-0 z-50'
             style={{ backgroundColor: 'rgba(35, 56, 118, 0.2)' }}
             onClick={hideSidebar}
@@ -692,7 +687,7 @@ const Main: FC<IMainProps> = () => {
           </div>
         )}
         {/* main */}
-        <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-auto'>
+        <div className='flex-grow flex flex-col h-[calc(100vh)] overflow-y-auto items-center justify-center'>
           <ConfigSence
             conversationName={conversationName}
             hasSetInputs={hasSetInputs}

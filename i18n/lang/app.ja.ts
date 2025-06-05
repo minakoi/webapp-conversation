@@ -15,7 +15,7 @@ const translation = {
     configStatusDes: '開始前に、会話設定を変更できます',
     configDisabled:
       '前回のセッション設定がこのセッションで使用されています。',
-    startChat: '開始',
+    startChat: '診　断',
     privacyPolicyLeft:
       'ご利用前に、',
     privacyPolicyMiddle:
