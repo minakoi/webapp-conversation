@@ -279,7 +279,7 @@ const Chat: FC<IChatProps> = ({
               }
               <Textarea
                 className={`
-                  block w-full px-2 pl-[75px] pr-[118px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
+                  block w-full px-2 pl-[75px] pr-[50px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
                 `}
                 value={query}
                 onChange={handleContentChange}
