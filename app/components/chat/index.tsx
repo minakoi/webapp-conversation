@@ -10,7 +10,7 @@ import Question from './question'
 import type { FeedbackFunc } from './type'
 import type { ChatItem, VisionFile, VisionSettings } from '@/types/app'
 import { TransferMethod } from '@/types/app'
-import Tooltip from '@/app/components/base/tooltip'
+// import Tooltip from '@/app/components/base/tooltip'
 import Toast from '@/app/components/base/toast'
 import ChatImageUploader from '@/app/components/base/image-uploader/chat-image-uploader'
 import ImageList from '@/app/components/base/image-uploader/image-list'
@@ -288,7 +288,13 @@ const Chat: FC<IChatProps> = ({
                 autoSize
               />
               <div className="absolute bottom-2 left-2 flex items-center">
-                <Tooltip
+                <div
+                  className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded-md ${isVolumeOn ? 'hover:bg-gray-100' : 'bg-red-100'}`}
+                  onClick={toggleVolumeOn}
+                >
+                  {isVolumeOn ? <Volume2 size={18} className="text-gray-500" /> : <VolumeOff size={18} className="text-red-500" />}
+                </div>
+                {/* <Tooltip
                   selector='volume2'
                   htmlContent={
                     <div>
@@ -317,10 +323,11 @@ const Chat: FC<IChatProps> = ({
                   >
                     {isListening ? <Mic size={18} className="text-gray-500" /> : <MicOff size={18} className="text-red-500" />}
                   </div>
-                </Tooltip>
+                </Tooltip> */}
               </div>
               <div className="absolute bottom-2 right-2 flex items-center h-8">
-                <Tooltip
+                <div className={`${s.sendBtn} w-8 h-8 cursor-pointer rounded-md`} onClick={handleSend}></div>
+                {/* <Tooltip
                   selector='send-tip'
                   htmlContent={
                     <div>
@@ -330,7 +337,7 @@ const Chat: FC<IChatProps> = ({
                   }
                 >
                   <div className={`${s.sendBtn} w-8 h-8 cursor-pointer rounded-md`} onClick={handleSend}></div>
-                </Tooltip>
+                </Tooltip> */}
               </div>
             </div>
           </div>
