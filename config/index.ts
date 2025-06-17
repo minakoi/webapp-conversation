@@ -4,7 +4,7 @@ export const API_KEY = `${process.env.NEXT_PUBLIC_APP_KEY}`
 export const API_URL = `${process.env.NEXT_PUBLIC_API_URL}`
 export const APP_INFO: AppInfo = {
   title: 'KOKORO COSMOS',
-  description: 'CASTのイベント用',
+  description: 'CAST 2025.07.19-21',
   copyright: '',
   privacy_policy: '',
   default_language: 'ja',

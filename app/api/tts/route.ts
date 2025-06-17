@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     // Call OpenAI's TTS API from the server
     const response = await openai.audio.speech.create({
       model: 'tts-1',
-      voice: 'onyx',
+      voice: 'echo',
       input: convert_for_natural_conversation(json_text.text),
     });
 
