@@ -342,7 +342,7 @@ const Welcome: FC<IWelcomeProps> = ({
   }
 
   return (
-    <div className='relative'>
+    <div className={`absolute ${s.customBtnDiv}`}>
       {hasSetInputs && renderHeader()}
       <div className='mx-auto px-3.5'>
         {/*  Has't set inputs  */}

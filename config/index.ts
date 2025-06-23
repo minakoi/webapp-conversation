@@ -3,7 +3,7 @@ export const APP_ID = `${process.env.NEXT_PUBLIC_APP_ID}`
 export const API_KEY = `${process.env.NEXT_PUBLIC_APP_KEY}`
 export const API_URL = `${process.env.NEXT_PUBLIC_API_URL}`
 export const APP_INFO: AppInfo = {
-  title: 'KOKORO COSMOS',
+  title: 'COCORO COSMOS',
   description: 'CAST 2025.07.19-21',
   copyright: '',
   privacy_policy: '',

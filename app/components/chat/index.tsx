@@ -56,11 +56,12 @@ export type IChatProps = {
   controlClearQuery?: number
   visionConfig?: VisionSettings
   setDoTTS?: Dispatch<SetStateAction<boolean>>
+  isMobile: boolean
 }
 
 const Chat: FC<IChatProps> = ({
   chatList,
-  feedbackDisabled = false,
+  feedbackDisabled = true,
   isHideSendInput = false,
   onFeedback,
   checkCanSend,
@@ -69,7 +70,8 @@ const Chat: FC<IChatProps> = ({
   isResponding,
   controlClearQuery,
   visionConfig,
-  setDoTTS
+  setDoTTS,
+  isMobile
 }) => {
   const { t } = useTranslation()
   const { notify } = Toast
@@ -77,6 +79,7 @@ const Chat: FC<IChatProps> = ({
   const [isListening, setIsListening] = useState(false)
   const [isVolumeOn, setVolumeOn] = useState(false)
   const recognitionRef = useRef<ISpeechRecognition | null>(null)
+  const inputFormRef = useRef<HTMLDivElement>(null)
 
   const [query, setQuery] = React.useState('')
   const handleContentChange = (e: any) => {
@@ -152,7 +155,7 @@ const Chat: FC<IChatProps> = ({
         recognitionRef.current.abort()
       }
     }
-  }, [])
+  }, [recognitionRef])
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
@@ -224,126 +227,75 @@ const Chat: FC<IChatProps> = ({
     }
   }
 
+
+
+  useEffect(() => {
+    // Function to update the orientation state
+    function updateOrientation() {
+      if (isMobile) {
+        inputFormRef.current?.classList.remove("pc:left-[244px]")
+        inputFormRef.current?.classList.remove("tablet:left-[192px]")
+        inputFormRef.current?.classList.remove("mobile:left-[240px]")
+      }
+      else {
+        inputFormRef.current?.classList.add("pc:left-[244px]")
+        inputFormRef.current?.classList.add("tablet:left-[192px]")
+        inputFormRef.current?.classList.add("mobile:left-[240px]")
+
+      }
+    }
+    // Initial update of the orientation state
+    updateOrientation();
+    // Add an event listener for orientation change
+    window.addEventListener("orientationchange", updateOrientation);
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener("orientationchange", updateOrientation);
+    };
+  }, [inputFormRef, isMobile]);
+
   return (
-    <div className={cn(!feedbackDisabled && 'px-3.5', 'h-full')}>
+    <>
       {/* Chat List */}
-      <div className="h-full space-y-[30px]">
-        {chatList.map((item) => {
-          if (item.isAnswer) {
-            const isLast = item.id === chatList[chatList.length - 1].id
-            return <Answer
-              key={item.id}
-              item={item}
-              feedbackDisabled={feedbackDisabled}
-              onFeedback={onFeedback}
-              isResponding={isResponding && isLast}
-            />
-          }
-          return (
-            <Question
-              key={item.id}
-              id={item.id}
-              content={item.content}
-              useCurrentUserAvatar={useCurrentUserAvatar}
-              imgSrcs={(item.message_files && item.message_files?.length > 0) ? item.message_files.map(item => item.url) : []}
-            />
-          )
-        })}
+      <div className="chat-answer">
+        {(chatList.length > 0) && <Answer
+          key={chatList[chatList.length - 1].id}
+          item={chatList[chatList.length - 1]}
+          feedbackDisabled={feedbackDisabled}
+          onFeedback={onFeedback}
+          isResponding={isResponding}
+          isMobile={isMobile}
+        />
+        }
       </div>
       {
         !isHideSendInput && (
-          <div className={cn(!feedbackDisabled && '!left-3.5 !right-3.5', 'absolute z-10 bottom-0 left-0 right-0')}>
-            <div className='p-[5.5px] max-h-[150px] bg-white border-[1.5px] border-gray-200 rounded-xl overflow-y-auto'>
-              {
-                visionConfig?.enabled && (
-                  <>
-                    <div className='absolute bottom-2 left-2 flex items-center'>
-                      <ChatImageUploader
-                        settings={visionConfig}
-                        onUpload={onUpload}
-                        disabled={files.length >= visionConfig.number_limits}
-                      />
-                      <div className='mx-1 w-[1px] h-4 bg-black/5' />
-                    </div>
-                    <div className='pl-[52px]'>
-                      <ImageList
-                        list={files}
-                        onRemove={onRemove}
-                        onReUpload={onReUpload}
-                        onImageLinkLoadSuccess={onImageLinkLoadSuccess}
-                        onImageLinkLoadError={onImageLinkLoadError}
-                      />
-                    </div>
-                  </>
-                )
-              }
+          <div className='input-form'>
+            <div ref={inputFormRef} className='input-container left-0'>
               <Textarea
-                className={`
-                  block w-full px-2 pl-[50px] pr-[50px] py-[7px] leading-5 max-h-none text-sm text-gray-700 outline-none appearance-none resize-none
-                `}
+                className='chat-input'
                 value={query}
                 onChange={handleContentChange}
                 onKeyUp={handleKeyUp}
                 onKeyDown={handleKeyDown}
                 autoSize
               />
-              <div className="absolute bottom-2 left-2 flex items-center">
+              <div className="absolute left-[31px] flex items-center">
                 <div
                   className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded-md ${isVolumeOn ? 'hover:bg-gray-100' : 'bg-red-100'}`}
                   onClick={toggleVolumeOn}
                 >
                   {isVolumeOn ? <Volume2 size={18} className="text-gray-500" /> : <VolumeOff size={18} className="text-red-500" />}
                 </div>
-                {/* <Tooltip
-                  selector='volume2'
-                  htmlContent={
-                    <div>
-                      {isVolumeOn ? t('common.operation.stopTextToSpeech') : t('common.operation.startTextToSpeech')}
-                    </div>
-                  }
-                >
-                  <div
-                    className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded-md ${isVolumeOn ? 'hover:bg-gray-100' : 'bg-red-100'}`}
-                    onClick={toggleVolumeOn}
-                  >
-                    {isVolumeOn ? <Volume2 size={18} className="text-gray-500" /> : <VolumeOff size={18} className="text-red-500" />}
-                  </div>
-                </Tooltip>
-                <Tooltip
-                  selector='mic-tip'
-                  htmlContent={
-                    <div>
-                      {isListening ? t('common.operation.stopListening') : t('common.operation.startListening')}
-                    </div>
-                  }
-                >
-                  <div
-                    className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded-md ${isListening ? 'hover:bg-gray-100' : 'bg-red-100'}`}
-                    onClick={toggleListening}
-                  >
-                    {isListening ? <Mic size={18} className="text-gray-500" /> : <MicOff size={18} className="text-red-500" />}
-                  </div>
-                </Tooltip> */}
               </div>
-              <div className="absolute bottom-2 right-2 flex items-center h-8">
+              <div className="absolute right-[31px] flex items-center h-8">
                 <div className={`${s.sendBtn} w-8 h-8 cursor-pointer rounded-md`} onClick={handleSend}></div>
-                {/* <Tooltip
-                  selector='send-tip'
-                  htmlContent={
-                    <div>
-                      <div>{t('common.operation.send')} Enter</div>
-                      <div>{t('common.operation.lineBreak')} Shift Enter</div>
-                    </div>
-                  }
-                >
-                  <div className={`${s.sendBtn} w-8 h-8 cursor-pointer rounded-md`} onClick={handleSend}></div>
-                </Tooltip> */}
               </div>
             </div>
           </div>
         )
       }
-    </div>
+    </>
   )
 }
 

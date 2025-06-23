@@ -17,18 +17,39 @@
   margin-right: 8px;
 }
 
-.customBtn {
-  width: calc(100vw - 30px);
-  max-width: 400px;
-  font-weight: 700;
-  font-size: 3rem;
-  height: 5rem;
-  background-color: #C2007B;
-}
-
 .logo {
   width: 48px;
   height: 20px;
   background: url(./icons/logo.png) center center no-repeat;
   background-size: contain;
+}
+
+@media screen and (orientation: landscape) {
+  .customBtnDiv {
+    bottom: 15%;
+  }
+
+  .customBtn {
+    width: calc(100vw - 100px);
+    max-width: 400px;
+    font-weight: 700;
+    background-color: #C2007B;
+    font-size: 2rem;
+    height: 3rem;
+  }
+}
+
+@media screen and (orientation: portrait) {
+  .customBtnDiv {
+    bottom: 22%;
+  }
+
+  .customBtn {
+    width: calc(100vw - 100px);
+    max-width: 400px;
+    font-weight: 700;
+    background-color: #C2007B;
+    font-size: 3rem;
+    height: 5rem;
+  }
 }

@@ -1,6 +1,6 @@
 'use client'
 import type { FC } from 'react'
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { HandThumbDownIcon, HandThumbUpIcon } from '@heroicons/react/24/outline'
 import { useTranslation } from 'react-i18next'
 import LoadingAnim from '../loading-anim'
@@ -60,6 +60,7 @@ type IAnswerProps = {
   onFeedback?: FeedbackFunc
   isResponding?: boolean
   allToolIcons?: Record<string, string | Emoji>
+  isMobile: boolean
 }
 
 // The component needs to maintain its own state to control whether to display input component
@@ -69,9 +70,11 @@ const Answer: FC<IAnswerProps> = ({
   onFeedback,
   isResponding,
   allToolIcons,
+  isMobile
 }) => {
   const { id, content, feedback, agent_thoughts, workflowProcess } = item
   const isAgentMode = !!agent_thoughts && agent_thoughts.length > 0
+  const ansAreaRef = useRef<HTMLDivElement>(null)
 
   const { t } = useTranslation()
 
@@ -165,9 +168,20 @@ const Answer: FC<IAnswerProps> = ({
     </div>
   )
 
+  useEffect(() => {
+    console.log("changed")
+    if (isMobile) {
+      ansAreaRef.current?.classList.add("ans-div-mobile")
+      ansAreaRef.current?.classList.remove("ans-div-not-mobile")
+    } else {
+      ansAreaRef.current?.classList.add("ans-div-not-mobile")
+      ansAreaRef.current?.classList.remove("ans-div-mobile")
+    }
+  }, [ansAreaRef, isMobile])
+
   return (
     <div key={id}>
-      <div className='flex items-start'>
+      <div className='flex justify-center items-start'>
         <div className={`${s.answerIcon} w-10 h-10 shrink-0`}>
           {isResponding
             && <div className={s.typeingIcon}>
@@ -176,8 +190,8 @@ const Answer: FC<IAnswerProps> = ({
           }
         </div>
         <div className={`${s.answerWrap}`}>
-          <div className={`${s.answer} relative text-sm text-gray-900`}>
-            <div className={`ml-2 py-3 px-4 bg-gray-100 rounded-tr-2xl rounded-b-2xl'}`}>
+          <div className={`${s.answer} relative text-gray-900`}>
+            <div ref={ansAreaRef} className={`ml-2 py-3 px-4 bg-gray-100 rounded-tr-2xl rounded-b-2xl overflow-scroll`}>
               {(isResponding && (isAgentMode ? (!content && (agent_thoughts || []).filter(item => !!item.thought || !!item.tool).length === 0) : !content))
                 ? (
                   <div className='flex items-center justify-center w-6 h-5'>

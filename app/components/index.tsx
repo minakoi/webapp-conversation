@@ -671,52 +671,41 @@ const Main: FC<IMainProps> = () => {
     return <Loading type='app' />
 
   return (
-    <div className='bg-gray-100'>
-      <div className="flex bg-white overflow-hidden"
-        style={{ backgroundImage: hasSetInputs ? "" : "url(./images/2505COCORO_COSMOS_dify_light.jpg)", backgroundPosition: "center", backgroundRepeat: "no-repeat", backgroundColor: "#282F60", backgroundAttachment: "fixed" }}>
+    <div className='h-screen' style={{ backgroundColor: "#e3b3ce" }}>
+      <div className='flex h-screen bg-center bg-no-repeat bg-fixed justify-center items-center' style={{ backgroundImage: hasSetInputs ? "" : "url(./images/DifyBGI.png)", backgroundSize: "auto 100vh" }}>
         {/* sidebar */}
         {hasSetInputs && !isMobile && renderSidebar()}
-        {hasSetInputs && isMobile && isShowSidebar && (
-          <div className='fixed inset-0 z-50'
-            style={{ backgroundColor: 'rgba(35, 56, 118, 0.2)' }}
-            onClick={hideSidebar}
-          >
-            <div className='inline-block' onClick={e => e.stopPropagation()}>
-              {renderSidebar()}
-            </div>
-          </div>
-        )}
         {/* main */}
-        <div className='flex-grow flex flex-col h-[calc(100vh)] overflow-y-auto items-center justify-center'>
-          <ConfigSence
-            conversationName={conversationName}
-            hasSetInputs={hasSetInputs}
-            isPublicVersion={isShowPrompt}
-            siteInfo={APP_INFO}
-            promptConfig={promptConfig}
-            onStartChat={handleStartChat}
-            canEditInputs={canEditInputs}
-            savedInputs={currInputs as Record<string, any>}
-            onInputsChange={setCurrInputs}
-          ></ConfigSence>
-
-          {
-            hasSetInputs && (
-              <div className='relative grow h-[200px] pc:w-[794px] max-w-full mobile:w-full pb-[66px] mx-auto mb-3.5 overflow-hidden'>
-                <div className='h-full overflow-y-auto' ref={chatListDomRef}>
-                  <Chat
-                    chatList={chatList}
-                    onSend={handleSend}
-                    onFeedback={handleFeedback}
-                    isResponding={isResponding}
-                    checkCanSend={checkCanSend}
-                    visionConfig={visionConfig}
-                    setDoTTS={setDoTTS}
-                  />
-                </div>
-              </div>)
-          }
-        </div>
+        {
+          !hasSetInputs && (
+            <ConfigSence
+              conversationName={conversationName}
+              hasSetInputs={hasSetInputs}
+              isPublicVersion={isShowPrompt}
+              siteInfo={APP_INFO}
+              promptConfig={promptConfig}
+              onStartChat={handleStartChat}
+              canEditInputs={canEditInputs}
+              savedInputs={currInputs as Record<string, any>}
+              onInputsChange={setCurrInputs}
+            ></ConfigSence>
+          )
+        }
+        {
+          hasSetInputs && (
+            <div className='chat-container' ref={chatListDomRef}>
+              <Chat
+                chatList={chatList}
+                onSend={handleSend}
+                onFeedback={handleFeedback}
+                isResponding={isResponding}
+                checkCanSend={checkCanSend}
+                visionConfig={visionConfig}
+                setDoTTS={setDoTTS}
+                isMobile={isMobile}
+              />
+            </div>)
+        }
         <audio ref={audioRef} autoPlay className="hidden" />
       </div>
     </div>
